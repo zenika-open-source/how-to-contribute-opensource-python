@@ -39,17 +39,18 @@ def get_weather():
     lat = geo["latitude"]
     lon = geo["longitude"]
     
-    weather_url = f"https://api.open-meteo.com/v1/forecast?latitude={lat}&longitude={lon}&current_weather=true"
-    
+    # Extended weather forecast for 7 days
+    weather_url = f"https://api.open-meteo.com/v1/forecast?latitude={lat}&longitude={lon}&daily=temperature_2m_max,temperature_2m_min,precipitation_sum&timezone=auto"
+
     try:
         weather_response = requests.get(weather_url)
         weather_response.raise_for_status()
         weather_data = weather_response.json()
 
-        if "current_weather" not in weather_data:
+        if "daily" not in weather_data:
             return jsonify({"error": "Invalid weather data received from API."}), 500
             
-        return jsonify(weather_data["current_weather"])
+        return jsonify(weather_data["daily"])
 
     except requests.exceptions.RequestException as e:
         return jsonify({"error": f"Failed to fetch weather data: {e}"}), 500
