@@ -1,27 +1,37 @@
 from flask import Flask, request, jsonify
 import requests
+import os
 
 app = Flask(__name__)
 
 def geocode_city_country(city, country):
+    """
+    Geocodes a city and country to latitude and longitude using the Open-Meteo API.
+    """
     url = f"https://geocoding-api.open-meteo.com/v1/search?name={city}&count=10&language=en&format=json"
-    response = requests.get(url)
-    if not response.ok:
+
+    try:
+        response = requests.get(url)
+        response.raise_for_status()
+        data = response.json()
+    except requests.exceptions.RequestException:
         return None
-    data = response.json()
+    except ValueError:
+        return None
+
     if not data.get("results"):
         return None
-    
-    result = next((r for r in data["results"] if r.get("country") == country), None)
-    
-    if result:
-        return {"latitude": result["latitude"], "longitude": result["longitude"]}
-    
-    if data["results"]:
-        first_result = data["results"][0]
-        return {"latitude": first_result["latitude"], "longitude": first_result["longitude"]}
-    
-    return None
+
+    for result in data["results"]:
+        if result.get("country") == country:
+            return {"latitude": result["latitude"], "longitude": result["longitude"]}
+
+    first_result = data["results"][0]
+    return {"latitude": first_result["latitude"], "longitude": first_result["longitude"]}
+
+@app.route("/")
+def index():
+    return jsonify({"message": "Welcome to the PyWeather API!"})
 
 @app.route("/api/weather")
 def get_weather():
@@ -55,4 +65,5 @@ def get_weather():
         return jsonify({"error": f"Failed to fetch weather data: {e}"}), 500
 
 if __name__ == "__main__":
-    app.run(port=8080)
+    port = int(os.environ.get("PORT", 8080))
+    app.run(host="0.0.0.0", port=port)
