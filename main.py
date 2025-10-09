@@ -2,9 +2,11 @@ from flask import Flask, request, jsonify
 import requests
 
 app = Flask(__name__)
+GEO_URL = "https://geocoding-api.open-meteo.com/v1"
+PORT = 8080
 
 def geocode_city_country(city, country):
-    url = f"https://geocoding-api.open-meteo.com/v1/search?name={city}&count=10&language=en&format=json"
+    url = f"{GEO_URL}/search?name={city}&count=10&language=en&format=json"
     response = requests.get(url)
     if not response.ok:
         return None
@@ -39,7 +41,7 @@ def get_weather():
     lat = geo["latitude"]
     lon = geo["longitude"]
     
-    weather_url = f"https://api.open-meteo.com/v1/forecast?latitude={lat}&longitude={lon}&current_weather=true"
+    weather_url = f"{GEO_URL}/forecast?latitude={lat}&longitude={lon}&current_weather=true"
     
     try:
         weather_response = requests.get(weather_url)
@@ -55,4 +57,4 @@ def get_weather():
         return jsonify({"error": f"Failed to fetch weather data: {e}"}), 500
 
 if __name__ == "__main__":
-    app.run(port=8080)
+    app.run(port=PORT)
