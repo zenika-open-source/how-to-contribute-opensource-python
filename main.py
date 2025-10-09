@@ -3,6 +3,7 @@ import requests
 
 app = Flask(__name__)
 GEO_URL = "https://geocoding-api.open-meteo.com/v1"
+PORT = 8080
 
 def geocode_city_country(city, country):
     url = f"{GEO_URL}/search?name={city}&count=10&language=en&format=json"
@@ -56,4 +57,4 @@ def get_weather():
         return jsonify({"error": f"Failed to fetch weather data: {e}"}), 500
 
 if __name__ == "__main__":
-    app.run(port=8080)
+    app.run(port=PORT)
