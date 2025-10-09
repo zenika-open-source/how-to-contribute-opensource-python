@@ -3,9 +3,11 @@ import requests
 
 app = Flask(__name__)
 
+proxies = {"https": "http://localhost:8088"}
+
 def geocode_city_country(city, country):
     url = f"https://geocoding-api.open-meteo.com/v1/search?name={city}&count=10&language=en&format=json"
-    response = requests.get(url)
+    response = requests.get(url, proxies = proxies, verify=False)
     if not response.ok:
         return None
     data = response.json()
@@ -42,7 +44,7 @@ def get_weather():
     weather_url = f"https://api.open-meteo.com/v1/forecast?latitude={lat}&longitude={lon}&current_weather=true"
     
     try:
-        weather_response = requests.get(weather_url)
+        weather_response = requests.get(weather_url, proxies=proxies, verify=False)
         weather_response.raise_for_status()
         weather_data = weather_response.json()
 
