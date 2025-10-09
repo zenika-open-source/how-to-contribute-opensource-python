@@ -1,0 +1,11 @@
+[project]
+name = "how-to-contribute-opensource-python"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "flask==3.0.3",
+    "gunicorn==22.0.0",
+    "requests==2.32.3",
+]
